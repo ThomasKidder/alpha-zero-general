@@ -35,7 +35,11 @@ class Token(Enum):
     PRESENCE = 5
     BLIGHT = 6
     # TODO(add other tokens)
-
+    WILDS = 7
+    PLAGUE = 8
+    FIST = 9
+    BADLANDS = 10
+    
 class Elements(Enum):
     FIRE = 1
     EARTH = 2
@@ -46,7 +50,9 @@ class Elements(Enum):
     ANIMAL = 7
     PLANT = 8
 
- 
+def is_coastal(self, land):
+    return land.num <= 3
+
 
 class Land():
     # Tokens: 
@@ -59,12 +65,19 @@ class Land():
     def changeTokens(self, Token, amount):
         self.tokens[Token] = self.tokens.get(Token, 0) + amount
 
+    def get_tokens(self, Token):
+        return self.tokens.get(Token, 0)
+
     def addToken(self, Token):
-        self.addTokens(Token, 1)
+        self.changeTokens(Token, 1)
     
-    def removeToken(self, Token):
+    # Returns true if a token was removed successfully
+    def remove_token(self, Token):
         if (self.tokens[Token] > 0):
-            self.changeTokens(Token, -1)        
+            self.changeTokens(Token, -1)   
+            return True
+        else:
+            return False     
 
 class Board():
     # TODO: Allow for other board initializations
@@ -98,12 +111,9 @@ class Board():
         self.land(6).addToken(Token.DAHAN)
         self.land(7).changeTokens(Token.DAHAN, 2)
         self.land(8).addToken(Token.TOWN)
-        
-    def is_coastal(self, land):
-        return land.num <= 3
-        
+                
     # Index of land on map
-    def land(self, num):
+    def get_land(self, num):
         return self.lands[num-1]
     
     def land_match(self, terrain):
@@ -137,21 +147,25 @@ class Board():
                 matches.append(land)
         return matches
 
+    # Takes list of land objects and returns list of 
+    # land objects within that range.
     def lands_from_dist(self, lands, dist):
+        # Contains land numbers
         current = {}
         for land in lands:
-            current.add(land)
+            current.add(land.num)
         
         for i in range(dist):
-            next = current.copy()
+            added = {}
             for land in current:
                 for adj in land.adj:
-                    next.add(adj)
-            current = next
+                    added.add(adj)
+            current.update(added)
         result = []
-        for id in current:
-            result.append(self, )
-
+        # Convert land numbers back to lands
+        for num in current:
+            result.append(self.get_land(id))
+        return result
 
 class Power():
     def __init__(self):
@@ -246,7 +260,7 @@ class SpiritIslandState():
         self.board = Board()
         self.spirit = VitalStrength()
         # Do initial explore
-
+        
     # Returns true if game is over
     def do_explore(self):
         terrain = self.board.explore()
@@ -254,7 +268,20 @@ class SpiritIslandState():
             return True
         matches = self.board.land_match(terrain)
         for match in matches:
-            if not is_coastal(match):
-                
+            needs_explore = False
+            if is_coastal(match):
+                needs_explore = True
+            else:
+                adj_lands = self.board.lands_from_dist([match], 1)
+                for land in adj_lands:
+                    if land.get_tokens(Token.TOWN) > 0 or land.get_tokens(Token.CITY) > 0:
+                        needs_explore = True
+                        break
+            if needs_explore:
+                if not match.remove_token(Token.WILDS):
+                    match.add_token(Token.EXPLORER)         
         return False
+
+    def do_build(self):
+        
         
