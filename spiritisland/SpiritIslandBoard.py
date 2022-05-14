@@ -211,19 +211,19 @@ class InvaderDeck():
         self.ravage = Terrain.NONE
 
     # Returns none if nothing left to explore, meaning game over.
-    def explore():
-        if not deck:
-            return Terrain.NONE
-        explored = deck.pop(0)
-        self.ravage = self.build
-        self.build = explored
-        return explored
+    # def explore():
+    #     if not deck:
+    #         return Terrain.NONE
+    #     explored = deck.pop(0)
+    #     self.ravage = self.build
+    #     self.build = explored
+    #     return explored
     
-    def build():
-        return self.build
+    # def build():
+    #     return self.build
     
-    def ravage():
-        return self.ravage
+    # def ravage():
+    #     return self.ravage
         
         
 
@@ -282,6 +282,6 @@ class SpiritIslandState():
                     match.add_token(Token.EXPLORER)         
         return False
 
-    def do_build(self):
+    # def do_build(self):
         
         
