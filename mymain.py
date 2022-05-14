@@ -1,7 +1,7 @@
 import sys
 # sys.path.append('..')
 
-from spiritisland.Animator import Animator
+from spiritisland.graphics.Animator import Animator
 
 def main():
     print("Hello World!")
